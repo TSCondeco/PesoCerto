@@ -1,13 +1,16 @@
 package pt.condeco.peso.ui
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -41,6 +44,7 @@ fun SettingsScreen(viewModel: WeightViewModel) {
     var showGoalDialog by remember { mutableStateOf(false) }
     var showSexDialog by remember { mutableStateOf(false) }
     var showDobDialog by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -50,6 +54,14 @@ fun SettingsScreen(viewModel: WeightViewModel) {
                 val content = context.contentResolver.openInputStream(it)?.bufferedReader()?.use { reader -> reader.readText() }
                 content?.let { csv -> viewModel.importCsv(csv) }
             } catch (e: Exception) { }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.toggleReminders(true)
         }
     }
 
@@ -155,6 +167,8 @@ fun SettingsScreen(viewModel: WeightViewModel) {
                         }
                     }
                     HorizontalDivider(color = Color(0xFFF0F2F5))
+                    
+                    // Reminders Switch
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -168,8 +182,64 @@ fun SettingsScreen(viewModel: WeightViewModel) {
                         }
                         Switch(
                             checked = uiState.remindersEnabled, 
-                            onCheckedChange = { viewModel.toggleReminders(it) }
+                            onCheckedChange = { 
+                                if (it && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                } else {
+                                    viewModel.toggleReminders(it) 
+                                }
+                            }
                         )
+                    }
+
+                    if (uiState.remindersEnabled) {
+                        HorizontalDivider(color = Color(0xFFF0F2F5))
+                        
+                        // Time Picker Item
+                        SettingsItem(label = stringResource(R.string.reminder_time), value = uiState.reminderTime) {
+                            showTimePicker = true
+                        }
+                        
+                        HorizontalDivider(color = Color(0xFFF0F2F5))
+                        
+                        // Days Selector
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(stringResource(R.string.reminder_days), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val dayIds = listOf("2", "3", "4", "5", "6", "7", "1") // Mon to Sun
+                                val dayLabels = listOf(
+                                    R.string.mon_short, R.string.tue_short, R.string.wed_short, 
+                                    R.string.thu_short, R.string.fri_short, R.string.sat_short, R.string.sun_short
+                                )
+                                
+                                dayIds.forEachIndexed { index, id ->
+                                    val isSelected = id in uiState.reminderDays
+                                    Surface(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {
+                                                val newDays = if (isSelected) uiState.reminderDays - id else uiState.reminderDays + id
+                                                viewModel.updateReminderDays(newDays)
+                                            },
+                                        shape = CircleShape,
+                                        color = if (isSelected) Color(0xFF3F51B5) else Color(0xFFF0F2F5)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(
+                                                text = stringResource(dayLabels[index]),
+                                                color = if (isSelected) Color.White else Color.Gray,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -325,6 +395,32 @@ fun SettingsScreen(viewModel: WeightViewModel) {
         ) {
             DatePicker(state = datePickerState)
         }
+    }
+
+    if (showTimePicker) {
+        val currentTime = uiState.reminderTime.split(":")
+        val timePickerState = rememberTimePickerState(
+            initialHour = currentTime[0].toInt(),
+            initialMinute = currentTime[1].toInt(),
+            is24Hour = true
+        )
+        
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val formattedTime = "%02d:%02d".format(timePickerState.hour, timePickerState.minute)
+                    viewModel.updateReminderTime(formattedTime)
+                    showTimePicker = false
+                }) { Text(stringResource(R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
+            },
+            text = {
+                TimePicker(state = timePickerState)
+            }
+        )
     }
 }
 

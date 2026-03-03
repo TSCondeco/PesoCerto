@@ -53,6 +53,8 @@
     <string name="imperial">Imperial</string>
     <string name="reminders">Reminders</string>
     <string name="daily_prompt">Daily prompt at</string>
+    <string name="reminder_time">Reminder Time</string>
+    <string name="reminder_days">Reminder Days</string>
     <string name="data_management">DATA MANAGEMENT</string>
     <string name="export_csv">Export CSV Dataset</string>
     <string name="import_csv">Import CSV Dataset</string>
@@ -64,4 +66,13 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="other">Other</string>
+    <string name="notification_title">Time to weigh in!</string>
+    <string name="notification_content">Don\'t forget to record your weight today to keep track of your progress.</string>
+    <string name="sun_short">S</string>
+    <string name="mon_short">M</string>
+    <string name="tue_short">T</string>
+    <string name="wed_short">W</string>
+    <string name="thu_short">T</string>
+    <string name="fri_short">F</string>
+    <string name="sat_short">S</string>
 </resources>

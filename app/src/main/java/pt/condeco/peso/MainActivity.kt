@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pt.condeco.peso.data.SettingsRepository
 import pt.condeco.peso.data.WeightDatabase
+import pt.condeco.peso.notifications.ReminderManager
 import pt.condeco.peso.ui.*
 import pt.condeco.peso.ui.theme.PesoTheme
 
@@ -25,11 +26,12 @@ class MainActivity : ComponentActivity() {
         val database by lazy { WeightDatabase.getDatabase(this) }
         val weightDao by lazy { database.weightDao() }
         val settingsRepository by lazy { SettingsRepository(this) }
+        val reminderManager by lazy { ReminderManager(this) }
 
         setContent {
             PesoTheme {
                 val viewModel: WeightViewModel = viewModel(
-                    factory = WeightViewModelFactory(weightDao, settingsRepository)
+                    factory = WeightViewModelFactory(weightDao, settingsRepository, reminderManager)
                 )
                 val currentScreen by viewModel.currentScreen.collectAsState()
 
@@ -50,7 +52,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    // Global Bottom Sheet for Adding/Editing
                     AddEntryBottomSheet(viewModel)
                 }
             }

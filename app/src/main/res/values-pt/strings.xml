@@ -53,6 +53,8 @@
     <string name="imperial">Imperial</string>
     <string name="reminders">Lembretes</string>
     <string name="daily_prompt">Aviso diário às</string>
+    <string name="reminder_time">Hora do Lembrete</string>
+    <string name="reminder_days">Dias do Lembrete</string>
     <string name="data_management">GESTÃO DE DADOS</string>
     <string name="export_csv">Exportar Dataset CSV</string>
     <string name="import_csv">Importar Dataset CSV</string>
@@ -64,4 +66,13 @@
     <string name="male">Masculino</string>
     <string name="female">Feminino</string>
     <string name="other">Outro</string>
+    <string name="notification_title">Hora de pesar!</string>
+    <string name="notification_content">Não te esqueças de registar o teu peso hoje para acompanhar o teu progresso.</string>
+    <string name="sun_short">D</string>
+    <string name="mon_short">S</string>
+    <string name="tue_short">T</string>
+    <string name="wed_short">Q</string>
+    <string name="thu_short">Q</string>
+    <string name="fri_short">S</string>
+    <string name="sat_short">S</string>
 </resources>

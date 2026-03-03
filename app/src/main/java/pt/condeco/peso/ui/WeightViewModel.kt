@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import pt.condeco.peso.data.SettingsRepository
 import pt.condeco.peso.data.WeightDao
 import pt.condeco.peso.data.WeightEntry
+import pt.condeco.peso.notifications.ReminderManager
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -31,6 +32,7 @@ data class WeightUiState(
     val unitSystem: String = "Metric",
     val remindersEnabled: Boolean = false,
     val reminderTime: String = "07:00",
+    val reminderDays: Set<String> = setOf("1", "2", "3", "4", "5", "6", "7"),
     val bmi: Float = 0f,
     val highestWeight: Float = 0f,
     val lowestWeight: Float = 0f,
@@ -44,7 +46,8 @@ data class WeightUiState(
 
 class WeightViewModel(
     private val weightDao: WeightDao,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val reminderManager: ReminderManager
 ) : ViewModel() {
 
     private val _currentScreen = MutableStateFlow<Screen>(Screen.Dashboard)
@@ -106,6 +109,8 @@ class WeightViewModel(
                 dateOfBirth = settings.dateOfBirth,
                 unitSystem = settings.unitSystem,
                 remindersEnabled = settings.remindersEnabled,
+                reminderTime = settings.reminderTime,
+                reminderDays = settings.reminderDays,
                 bmi = bmi,
                 highestWeight = highest?.weight ?: 0f,
                 highestWeightDate = highest?.date ?: 0,
@@ -150,7 +155,34 @@ class WeightViewModel(
     fun updateSex(newSex: String) { viewModelScope.launch { settingsRepository.updateSex(newSex) } }
     fun updateDob(newDob: Long) { viewModelScope.launch { settingsRepository.updateDob(newDob) } }
     fun updateUnitSystem(newUnit: String) { viewModelScope.launch { settingsRepository.updateUnitSystem(newUnit) } }
-    fun toggleReminders(enabled: Boolean) { viewModelScope.launch { settingsRepository.updateRemindersEnabled(enabled) } }
+    
+    fun toggleReminders(enabled: Boolean) { 
+        viewModelScope.launch { 
+            settingsRepository.updateRemindersEnabled(enabled)
+            if (enabled) {
+                reminderManager.scheduleReminder(uiState.value.reminderTime)
+            } else {
+                reminderManager.cancelReminder()
+            }
+        } 
+    }
+    
+    fun updateReminderTime(time: String) { 
+        viewModelScope.launch { 
+            settingsRepository.updateReminderTime(time)
+            if (uiState.value.remindersEnabled) {
+                reminderManager.scheduleReminder(time)
+            }
+        } 
+    }
+    
+    fun updateReminderDays(days: Set<String>) { 
+        viewModelScope.launch { 
+            settingsRepository.updateReminderDays(days)
+            // No need to reschedule alarm itself, the receiver checks the days
+        } 
+    }
+    
     fun updateGoalWeight(newGoal: Float) { viewModelScope.launch { settingsRepository.updateGoalWeight(newGoal) } }
 
     fun saveWeight(weight: Float, bodyFat: Float?, date: Long) {
@@ -219,12 +251,13 @@ sealed class Screen {
 
 class WeightViewModelFactory(
     private val weightDao: WeightDao,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val reminderManager: ReminderManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WeightViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WeightViewModel(weightDao, settingsRepository) as T
+            return WeightViewModel(weightDao, settingsRepository, reminderManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
