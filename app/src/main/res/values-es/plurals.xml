@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="streak_current_days">
+        <item quantity="one">🔥 Racha de %1$d día</item>
+        <item quantity="other">🔥 Racha de %1$d días</item>
+    </plurals>
+    <plurals name="streak_current_weeks">
+        <item quantity="one">🔥 Racha de %1$d semana</item>
+        <item quantity="other">🔥 Racha de %1$d semanas</item>
+    </plurals>
+    <plurals name="streak_current_months">
+        <item quantity="one">🔥 Racha de %1$d mes</item>
+        <item quantity="other">🔥 Racha de %1$d meses</item>
+    </plurals>
+    <plurals name="streak_longest_days">
+        <item quantity="one">Mejor: %1$d día</item>
+        <item quantity="other">Mejor: %1$d días</item>
+    </plurals>
+    <plurals name="streak_longest_weeks">
+        <item quantity="one">Mejor: %1$d semana</item>
+        <item quantity="other">Mejor: %1$d semanas</item>
+    </plurals>
+    <plurals name="streak_longest_months">
+        <item quantity="one">Mejor: %1$d mes</item>
+        <item quantity="other">Mejor: %1$d meses</item>
+    </plurals>
+</resources>

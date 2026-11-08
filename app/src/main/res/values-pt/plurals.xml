@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="streak_current_days">
+        <item quantity="one">🔥 %1$d dia seguido</item>
+        <item quantity="other">🔥 %1$d dias seguidos</item>
+    </plurals>
+    <plurals name="streak_current_weeks">
+        <item quantity="one">🔥 %1$d semana seguida</item>
+        <item quantity="other">🔥 %1$d semanas seguidas</item>
+    </plurals>
+    <plurals name="streak_current_months">
+        <item quantity="one">🔥 %1$d mês seguido</item>
+        <item quantity="other">🔥 %1$d meses seguidos</item>
+    </plurals>
+    <plurals name="streak_longest_days">
+        <item quantity="one">Melhor: %1$d dia</item>
+        <item quantity="other">Melhor: %1$d dias</item>
+    </plurals>
+    <plurals name="streak_longest_weeks">
+        <item quantity="one">Melhor: %1$d semana</item>
+        <item quantity="other">Melhor: %1$d semanas</item>
+    </plurals>
+    <plurals name="streak_longest_months">
+        <item quantity="one">Melhor: %1$d mês</item>
+        <item quantity="other">Melhor: %1$d meses</item>
+    </plurals>
+</resources>
